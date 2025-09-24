@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.pm.PackageInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -30,6 +31,7 @@ import com.google.zxing.common.HybridBinarizer
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.DecoratedBarcodeView
+import com.example.glassassistant.services.InstallationHistoryService
 import dev.synople.glassassistant.R
 import dev.synople.glassassistant.utils.GlassGesture
 import dev.synople.glassassistant.utils.GlassGestureDetector
@@ -37,6 +39,7 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import java.io.File
+import java.io.FileInputStream
 import java.net.URL
 import java.security.MessageDigest
 import javax.net.ssl.HttpsURLConnection
@@ -53,6 +56,10 @@ class QrApkInstallerFragment : Fragment() {
     private var downloadId: Long = -1
     private lateinit var downloadManager: DownloadManager
     private var downloadedApkUri: Uri? = null
+
+    private lateinit var installationHistory: InstallationHistoryService
+    private var currentInstallEntry: InstallationHistoryService.InstallationEntry? = null
+    private var lastScannedQrCode: String? = null
 
     private val downloadReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -81,9 +88,23 @@ class QrApkInstallerFragment : Fragment() {
         instructionText = view.findViewById(R.id.tvInstruction)
 
         downloadManager = requireContext().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        installationHistory = InstallationHistoryService(requireContext())
 
         setupBarcodeScanner()
         checkPermissions()
+
+        // Display security stats
+        showSecurityStats()
+    }
+
+    private fun showSecurityStats() {
+        val stats = installationHistory.getStatistics()
+        val suspiciousCount = stats["suspicious"] as Int
+        if (suspiciousCount > 0) {
+            Toast.makeText(requireContext(),
+                "⚠️ $suspiciousCount suspicious installations detected",
+                Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun setupBarcodeScanner() {
@@ -109,6 +130,7 @@ class QrApkInstallerFragment : Fragment() {
 
         // Stop scanning
         barcodeView.pause()
+        lastScannedQrCode = qrContent
 
         // Check if it's a valid URL
         if (isValidApkUrl(qrContent)) {
@@ -182,6 +204,10 @@ class QrApkInstallerFragment : Fragment() {
             statusText.text = "Downloading APK..."
             instructionText.text = "Please wait..."
 
+            // Create installation history entry
+            currentInstallEntry = installationHistory.createDownloadEntry(url, lastScannedQrCode)
+            installationHistory.logInstallation(currentInstallEntry!!)
+
             val fileName = "downloaded_${System.currentTimeMillis()}.apk"
             val request = DownloadManager.Request(Uri.parse(url))
                 .setTitle("Downloading APK")
@@ -192,6 +218,12 @@ class QrApkInstallerFragment : Fragment() {
                 .setAllowedOverRoaming(true)
 
             downloadId = downloadManager.enqueue(request)
+
+            // Update entry to downloading status
+            currentInstallEntry = currentInstallEntry?.copy(
+                installationStatus = InstallationHistoryService.InstallationStatus.DOWNLOADING
+            )
+            currentInstallEntry?.let { installationHistory.logInstallation(it) }
 
             // Register receiver for download completion
             requireContext().registerReceiver(
@@ -206,6 +238,12 @@ class QrApkInstallerFragment : Fragment() {
             Log.e(TAG, "Error starting download", e)
             statusText.text = "Download failed: ${e.message}"
             progressBar.visibility = View.GONE
+
+            // Log failure
+            currentInstallEntry?.let {
+                val failedEntry = installationHistory.markFailed(it, e.message ?: "Unknown error")
+                installationHistory.logInstallation(failedEntry)
+            }
         }
     }
 
@@ -263,6 +301,22 @@ class QrApkInstallerFragment : Fragment() {
                 cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI)
             )
             downloadedApkUri = Uri.parse(uriString)
+
+            // Get file size and calculate hash
+            val file = File(Uri.parse(uriString).path!!)
+            val fileSize = file.length()
+            val sha256 = calculateSHA256(file)
+
+            // Update installation entry with download details
+            currentInstallEntry?.let {
+                currentInstallEntry = installationHistory.updateDownloadComplete(
+                    it, fileSize, sha256
+                )
+                installationHistory.logInstallation(currentInstallEntry!!)
+
+                // Extract and verify package info
+                verifyApkPackage(file)
+            }
         }
         cursor.close()
 
@@ -272,9 +326,72 @@ class QrApkInstallerFragment : Fragment() {
         }, 1000)
     }
 
+    private fun calculateSHA256(file: File): String? {
+        return try {
+            val digest = MessageDigest.getInstance("SHA-256")
+            val fis = FileInputStream(file)
+            val byteArray = ByteArray(1024)
+            var bytesCount: Int
+
+            while (fis.read(byteArray).also { bytesCount = it } != -1) {
+                digest.update(byteArray, 0, bytesCount)
+            }
+            fis.close()
+
+            val bytes = digest.digest()
+            bytes.joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error calculating SHA256", e)
+            null
+        }
+    }
+
+    private fun verifyApkPackage(file: File) {
+        try {
+            val packageInfo = requireContext().packageManager.getPackageArchiveInfo(
+                file.absolutePath,
+                PackageManager.GET_SIGNATURES
+            )
+
+            packageInfo?.let { info ->
+                val packageName = info.packageName
+                val versionName = info.versionName
+                val versionCode = info.versionCode
+
+                // Check signature validity (simplified - in production, compare with known good signatures)
+                val signatureValid = info.signatures?.isNotEmpty() == true
+
+                currentInstallEntry?.let {
+                    currentInstallEntry = installationHistory.updatePackageInfo(
+                        it, packageName, versionName, versionCode, signatureValid
+                    )
+                    installationHistory.logInstallation(currentInstallEntry!!)
+
+                    if (!signatureValid) {
+                        Toast.makeText(
+                            requireContext(),
+                            "⚠️ Warning: APK signature could not be verified",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error verifying APK package", e)
+        }
+    }
+
     private fun installApk() {
         downloadedApkUri?.let { uri ->
             try {
+                // Update status to installing
+                currentInstallEntry?.let {
+                    currentInstallEntry = it.copy(
+                        installationStatus = InstallationHistoryService.InstallationStatus.INSTALLING
+                    )
+                    installationHistory.logInstallation(currentInstallEntry!!)
+                }
+
                 val intent = Intent(Intent.ACTION_VIEW)
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -297,9 +414,21 @@ class QrApkInstallerFragment : Fragment() {
                 statusText.text = "Installing APK..."
                 instructionText.text = "Follow system prompts to complete installation"
 
+                // Mark as successful (user will complete installation)
+                currentInstallEntry?.let {
+                    val successEntry = installationHistory.markSuccess(it)
+                    installationHistory.logInstallation(successEntry)
+                }
+
             } catch (e: Exception) {
                 Log.e(TAG, "Error installing APK", e)
                 statusText.text = "Installation failed: ${e.message}"
+
+                // Log failure
+                currentInstallEntry?.let {
+                    val failedEntry = installationHistory.markFailed(it, e.message ?: "Unknown error")
+                    installationHistory.logInstallation(failedEntry)
+                }
             }
         }
     }
