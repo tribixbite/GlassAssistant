@@ -1,0 +1,435 @@
+{
+  "metadata": {
+    "title": "Google Glass Developer Documentation",
+    "version": "Explorer Edition",
+    "status": "Deprecated",
+    "last_updated": "2024",
+    "note": "This documentation is for historical reference. Glass Explorer Edition SDK is deprecated."
+  },
+  "platform": {
+    "overview": {
+      "description": "Google Glass is a wearable computer with an optical head-mounted display",
+      "display": {
+        "resolution": "640x360",
+        "type": "Prism projector",
+        "equivalent": "25 inch screen from 8 feet"
+      },
+      "features": [
+        "Voice control",
+        "Touch pad navigation",
+        "Camera for photos and video",
+        "Gyroscope, accelerometer, compass sensors",
+        "WiFi and Bluetooth connectivity"
+      ]
+    },
+    "development_options": [
+      {
+        "name": "Glass Development Kit (GDK)",
+        "type": "Native",
+        "platform": "Android",
+        "features": [
+          "Runs directly on Glass",
+          "Full hardware access",
+          "Real-time interactions",
+          "Offline functionality",
+          "Complex UI controls"
+        ]
+      },
+      {
+        "name": "Mirror API",
+        "type": "Cloud-based",
+        "platform": "RESTful Web Service",
+        "features": [
+          "Platform independent",
+          "Automatic syncing",
+          "Simple timeline integration",
+          "Push notifications",
+          "No Android development required"
+        ]
+      }
+    ]
+  },
+  "getting_started": {
+    "requirements": {
+      "software": [
+        "Android Studio or Eclipse with ADT",
+        "Android SDK (API 19 - Android 4.4)",
+        "Glass Development Kit Preview",
+        "Glass device or emulator"
+      ],
+      "setup_steps": [
+        {
+          "step": 1,
+          "action": "Install Android SDK",
+          "details": "Download and install API level 19 (Android 4.4 KitKat)"
+        },
+        {
+          "step": 2,
+          "action": "Add GDK",
+          "details": "SDK Manager → Tools → Manage Add-on Sites → Add: https://developers.google.com/glass/gdk"
+        },
+        {
+          "step": 3,
+          "action": "Create Project",
+          "details": "Minimum SDK: API 19, Target SDK: Glass Development Kit Preview"
+        }
+      ]
+    },
+    "hello_world": {
+      "java_code": "public class MainActivity extends Activity {\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        Card card = new Card(this);\n        card.setText(\"Hello, Glass!\");\n        card.setFootnote(\"My First Glassware\");\n        setContentView(card.getView());\n    }\n}",
+      "manifest": "<activity android:name=\".MainActivity\">\n    <intent-filter>\n        <action android:name=\"com.google.android.glass.action.VOICE_TRIGGER\" />\n    </intent-filter>\n    <meta-data\n        android:name=\"com.google.android.glass.VoiceTrigger\"\n        android:resource=\"@xml/voice_trigger\" />\n</activity>",
+      "voice_trigger": "<trigger keyword=\"hello glass\" />"
+    }
+  },
+  "design_principles": {
+    "core_principles": [
+      {
+        "name": "Design for Glass",
+        "description": "Don't try to replace a smartphone. Build experiences unique to Glass."
+      },
+      {
+        "name": "Don't Get in the Way",
+        "description": "Be there when needed, get out of the way when not."
+      },
+      {
+        "name": "Keep it Relevant",
+        "description": "Deliver timely information using context and location."
+      },
+      {
+        "name": "Avoid the Unexpected",
+        "description": "Be predictable and maintain consistency."
+      },
+      {
+        "name": "Build for the Future",
+        "description": "Think beyond Glass, design for multiple form factors."
+      }
+    ],
+    "four_cs": {
+      "current": "Information relevant to the present moment",
+      "clear": "Easy to understand at a glance",
+      "concise": "Read in 2-3 seconds",
+      "compelling": "Worth the user's attention"
+    },
+    "typography": {
+      "primary_text": "40 characters or less",
+      "footer_text": "30 characters or less",
+      "timestamp": "Relative time (e.g., '5 minutes ago')",
+      "fonts": ["Roboto Light", "Roboto Regular", "Roboto Thin"]
+    }
+  },
+  "gdk": {
+    "components": {
+      "card_builder": {
+        "description": "Create timeline cards",
+        "methods": [
+          "setText(CharSequence text)",
+          "setFootnote(CharSequence footnote)",
+          "setTimestamp(CharSequence timestamp)",
+          "setImageLayout(ImageLayout layout)",
+          "addImage(int imageId)",
+          "getView()"
+        ],
+        "image_layouts": ["FULL", "LEFT", "BACKGROUND"]
+      },
+      "live_card": {
+        "description": "Cards that update frequently in the timeline",
+        "lifecycle": ["Create", "Publish", "Update", "Unpublish"],
+        "publish_modes": ["REVEAL", "SILENT"],
+        "update_methods": ["RemoteViews", "Direct rendering with SurfaceHolder"]
+      },
+      "immersion": {
+        "description": "Full-screen interactive experiences",
+        "features": [
+          "Complete UI control",
+          "Custom layouts",
+          "Direct gesture handling",
+          "Sensor access"
+        ]
+      }
+    },
+    "gestures": {
+      "types": [
+        {"name": "TAP", "action": "Select or activate"},
+        {"name": "TWO_TAP", "action": "Special action"},
+        {"name": "SWIPE_RIGHT", "action": "Next item"},
+        {"name": "SWIPE_LEFT", "action": "Previous item"},
+        {"name": "SWIPE_DOWN", "action": "Dismiss/Back"},
+        {"name": "SWIPE_UP", "action": "Show menu"},
+        {"name": "THREE_TAP", "action": "Debug mode"}
+      ]
+    },
+    "voice": {
+      "triggers": {
+        "description": "Launch Glassware from home screen",
+        "constraints": ["network", "camera"],
+        "input_prompt": true
+      },
+      "menu_commands": {
+        "description": "Contextual voice commands in menu",
+        "implementation": "WindowUtils.FEATURE_VOICE_COMMANDS"
+      },
+      "speech_recognition": {
+        "description": "Free-form speech to text",
+        "intent": "RecognizerIntent.ACTION_RECOGNIZE_SPEECH"
+      }
+    },
+    "sensors": {
+      "available": [
+        "TYPE_ACCELEROMETER",
+        "TYPE_MAGNETIC_FIELD",
+        "TYPE_ORIENTATION",
+        "TYPE_GYROSCOPE",
+        "TYPE_LIGHT",
+        "TYPE_GRAVITY",
+        "TYPE_LINEAR_ACCELERATION",
+        "TYPE_ROTATION_VECTOR"
+      ]
+    }
+  },
+  "mirror_api": {
+    "endpoints": {
+      "timeline": {
+        "base_url": "https://www.googleapis.com/mirror/v1/timeline",
+        "operations": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        "item_structure": {
+          "text": "string",
+          "html": "string",
+          "notification": {
+            "level": "DEFAULT"
+          },
+          "menuItems": [
+            {"action": "REPLY"},
+            {"action": "DELETE"},
+            {"action": "SHARE"},
+            {"action": "READ_ALOUD"},
+            {"action": "CUSTOM"}
+          ]
+        }
+      },
+      "contacts": {
+        "base_url": "https://www.googleapis.com/mirror/v1/contacts",
+        "operations": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        "contact_structure": {
+          "id": "string",
+          "displayName": "string",
+          "imageUrls": ["string"],
+          "priority": "number",
+          "acceptCommands": [
+            {"type": "POST_AN_UPDATE"},
+            {"type": "TAKE_A_NOTE"}
+          ]
+        }
+      },
+      "subscriptions": {
+        "base_url": "https://www.googleapis.com/mirror/v1/subscriptions",
+        "operations": ["GET", "POST", "DELETE"],
+        "subscription_structure": {
+          "collection": "timeline",
+          "userToken": "string",
+          "callbackUrl": "string",
+          "operation": ["UPDATE", "INSERT", "DELETE"]
+        }
+      },
+      "locations": {
+        "base_url": "https://www.googleapis.com/mirror/v1/locations",
+        "operations": ["GET"],
+        "location_structure": {
+          "id": "string",
+          "timestamp": "datetime",
+          "latitude": "number",
+          "longitude": "number",
+          "accuracy": "number",
+          "displayName": "string",
+          "address": "string"
+        }
+      }
+    },
+    "authentication": {
+      "type": "OAuth 2.0",
+      "flow": [
+        "Authorization request",
+        "User consent",
+        "Authorization code",
+        "Token exchange",
+        "API access with bearer token"
+      ],
+      "scopes": [
+        "https://www.googleapis.com/auth/glass.timeline",
+        "https://www.googleapis.com/auth/glass.location",
+        "https://www.googleapis.com/auth/userinfo.profile"
+      ]
+    },
+    "menu_items": [
+      "REPLY",
+      "REPLY_ALL",
+      "DELETE",
+      "SHARE",
+      "READ_ALOUD",
+      "VOICE_CALL",
+      "NAVIGATE",
+      "TOGGLE_PINNED",
+      "OPEN_URI",
+      "PLAY_VIDEO",
+      "SEND_MESSAGE",
+      "CUSTOM"
+    ]
+  },
+  "best_practices": {
+    "performance": [
+      "Keep APK under 50MB",
+      "Optimize for 640×360 display",
+      "Minimize battery usage",
+      "Use efficient data structures",
+      "Cache data when possible",
+      "Avoid blocking UI thread"
+    ],
+    "user_experience": [
+      "Quick interactions (2-3 seconds)",
+      "Clear navigation",
+      "Consistent behavior",
+      "Appropriate notifications",
+      "Respect user attention",
+      "Test while mobile"
+    ],
+    "privacy_security": [
+      "Transparent data collection",
+      "Secure data transmission",
+      "Respect recording policies",
+      "Clear privacy policy",
+      "User consent for permissions",
+      "Follow platform policies"
+    ],
+    "testing": [
+      "Test on actual hardware",
+      "Test in bright sunlight",
+      "Test while walking",
+      "Test battery consumption",
+      "Test network disconnection",
+      "Test voice commands",
+      "Test all gestures",
+      "Test with prescription frames"
+    ]
+  },
+  "distribution": {
+    "requirements": {
+      "functionality": [
+        "Clear value proposition",
+        "Appropriate for Glass",
+        "Stable and reliable",
+        "Good performance",
+        "Proper error handling"
+      ],
+      "design": [
+        "Follow Glass design principles",
+        "Consistent UI patterns",
+        "Appropriate notifications",
+        "Clear navigation",
+        "Good typography"
+      ],
+      "technical": [
+        "Proper permissions",
+        "Secure data handling",
+        "Efficient resource usage",
+        "Proper lifecycle handling",
+        "Clean uninstall"
+      ]
+    },
+    "review_process": [
+      "Development",
+      "Submission",
+      "Technical review",
+      "Design review",
+      "Policy compliance",
+      "Approval",
+      "Launch"
+    ],
+    "policies": {
+      "prohibited_content": [
+        "Illegal activities",
+        "Hate speech",
+        "Violence",
+        "Sexually explicit material",
+        "Gambling",
+        "Malware"
+      ],
+      "required_disclosures": [
+        "Data collection",
+        "Third-party services",
+        "In-app purchases",
+        "Ads",
+        "Recording capabilities"
+      ]
+    }
+  },
+  "sample_projects": [
+    {
+      "name": "Compass",
+      "description": "Sensor usage example with Live Card",
+      "features": ["Magnetic field sensor", "Live Card updates", "Custom drawing"]
+    },
+    {
+      "name": "Stopwatch",
+      "description": "Timer with Live Card",
+      "features": ["Chronometer", "Live Card", "Voice commands"]
+    },
+    {
+      "name": "Timer",
+      "description": "Countdown timer",
+      "features": ["Voice input", "Time picker", "Notifications"]
+    },
+    {
+      "name": "Charades",
+      "description": "Game example",
+      "features": ["Immersion", "Gestures", "Game mechanics"]
+    }
+  ],
+  "resources": {
+    "documentation": [
+      "https://developers.google.com/glass",
+      "https://developer.android.com",
+      "https://developers.google.com/glass/v1/reference",
+      "https://developers.google.com/glass/develop/gdk/reference"
+    ],
+    "tools": [
+      "Android Studio",
+      "Glass Development Kit",
+      "Mirror API Playground",
+      "MyGlass app"
+    ],
+    "community": [
+      "Stack Overflow: google-glass",
+      "Stack Overflow: google-gdk",
+      "Stack Overflow: google-mirror-api",
+      "Glass Developers Community"
+    ]
+  },
+  "common_issues": {
+    "battery_drain": {
+      "solutions": [
+        "Minimize wake locks",
+        "Use JobScheduler for background tasks",
+        "Optimize network requests",
+        "Reduce screen brightness",
+        "Limit GPS usage"
+      ]
+    },
+    "voice_recognition": {
+      "solutions": [
+        "Test in quiet environment",
+        "Provide visual feedback",
+        "Have fallback input method",
+        "Use simple commands",
+        "Test with accents"
+      ]
+    },
+    "network_issues": {
+      "solutions": [
+        "Handle offline mode",
+        "Cache important data",
+        "Queue requests",
+        "Provide sync status",
+        "Graceful degradation"
+      ]
+    }
+  }
+}
