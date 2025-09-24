@@ -10,10 +10,11 @@ android {
 
     defaultConfig {
         applicationId = "dev.synople.glassassistant"
-        minSdk = 27
-        targetSdk = 34
+        minSdk = 19  // Google Glass XE24 runs on API 19 (KitKat)
+        targetSdk = 19  // Target API 19 for Glass compatibility
         versionCode = 3
         versionName = "1.0.2"
+        multiDexEnabled = true  // Enable multidex for method count > 64K
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.multidex:multidex:2.0.1")  // Required for API 19 with multidex
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
