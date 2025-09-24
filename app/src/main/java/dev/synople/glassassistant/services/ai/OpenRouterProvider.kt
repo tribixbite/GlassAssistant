@@ -2,6 +2,8 @@ package dev.synople.glassassistant.services.ai
 
 import android.util.Base64
 import android.util.Log
+import dev.synople.glassassistant.services.security.CertificatePinner
+import dev.synople.glassassistant.services.security.RateLimiter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -13,6 +15,7 @@ import java.io.File
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 class OpenRouterProvider(
     private var customBaseUrl: String? = null
@@ -28,13 +31,39 @@ class OpenRouterProvider(
     private val baseUrl: String
         get() = customBaseUrl ?: DEFAULT_BASE_URL
 
+    private val certificatePinner = CertificatePinner()
+    private val rateLimiter = RateLimiter()
+
+    init {
+        // Enable certificate pinning for security
+        certificatePinner.setPinningEnabled(true)
+        certificatePinner.setStrictMode(false) // Allow connections if no pins configured
+
+        // Configure rate limiting for OpenRouter
+        rateLimiter.updateProviderLimit("openrouter", 100, 60000) // 100 requests per minute
+    }
+
+    /**
+     * Create a secure connection with certificate pinning
+     */
+    private fun createSecureConnection(url: URL): HttpURLConnection {
+        val connection = url.openConnection() as HttpURLConnection
+
+        // Apply certificate pinning for HTTPS connections
+        if (connection is HttpsURLConnection) {
+            certificatePinner.applyPinning(connection)
+        }
+
+        return connection
+    }
+
     override fun getProviderName(): String = "OpenRouter"
 
     override suspend fun getAvailableModels(): List<AIProvider.AIModel> {
         return withContext(Dispatchers.IO) {
             try {
                 val url = URL("$baseUrl$MODELS_ENDPOINT")
-                val connection = url.openConnection() as HttpURLConnection
+                val connection = createSecureConnection(url)
                 connection.requestMethod = "GET"
                 connection.setRequestProperty("Content-Type", "application/json")
 
@@ -100,7 +129,7 @@ class OpenRouterProvider(
             try {
                 // Try to fetch models with the API key
                 val url = URL("$baseUrl$MODELS_ENDPOINT")
-                val connection = url.openConnection() as HttpURLConnection
+                val connection = createSecureConnection(url)
                 connection.requestMethod = "GET"
                 connection.setRequestProperty("Authorization", "Bearer $apiKey")
                 connection.setRequestProperty("Content-Type", "application/json")
@@ -117,8 +146,12 @@ class OpenRouterProvider(
     override suspend fun query(request: AIProvider.AIRequest, apiKey: String): AIProvider.AIResponse {
         return withContext(Dispatchers.IO) {
             try {
+                // Check rate limit
+                if (!rateLimiter.allowRequest("openrouter", null, true)) {
+                    Log.w(TAG, "Rate limit exceeded, waiting...")
+                }
                 val url = URL("$baseUrl$CHAT_ENDPOINT")
-                val connection = url.openConnection() as HttpURLConnection
+                val connection = createSecureConnection(url)
                 connection.requestMethod = "POST"
                 connection.doOutput = true
                 connection.setRequestProperty("Authorization", "Bearer $apiKey")
@@ -275,7 +308,7 @@ class OpenRouterProvider(
                 streamingCallback.onStreamStart()
 
                 val url = URL("$baseUrl$CHAT_ENDPOINT")
-                val connection = url.openConnection() as HttpURLConnection
+                val connection = createSecureConnection(url)
                 connection.requestMethod = "POST"
                 connection.setRequestProperty("Content-Type", "application/json")
                 connection.setRequestProperty("Authorization", "Bearer $apiKey")

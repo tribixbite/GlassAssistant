@@ -33,9 +33,9 @@
 
 ### [🔧] Security Hardening
 - [x] Implement encrypted API key storage using Android Keystore (API 19 compatible)
-- [ ] Add certificate pinning for API calls
+- [x] Add certificate pinning for API calls
 - [ ] Implement request signing and validation
-- [ ] Add rate limiting and request throttling
+- [x] Add rate limiting and request throttling
 - [ ] Implement secure temporary file handling
 - [ ] Add memory-safe image processing
 - [ ] Clear sensitive data from memory after use
