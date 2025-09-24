@@ -1,6 +1,5 @@
 package dev.synople.glassassistant.fragments
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,8 +9,8 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import dev.synople.glassassistant.R
+import dev.synople.glassassistant.security.SecureStorage
 import dev.synople.glassassistant.services.ai.*
 import dev.synople.glassassistant.utils.GlassGesture
 import dev.synople.glassassistant.utils.GlassGestureDetector
@@ -33,7 +32,7 @@ class ProviderSettingsFragment : Fragment() {
     private lateinit var statusText: TextView
     private lateinit var progressBar: ProgressBar
 
-    private lateinit var sharedPrefs: SharedPreferences
+    private lateinit var secureStorage: SecureStorage
     private var currentProvider: AIProvider? = null
     private val providers = mutableMapOf<String, AIProvider>()
 
@@ -47,7 +46,8 @@ class ProviderSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        secureStorage = SecureStorage(requireContext())
+        secureStorage.migrateUnencryptedData() // Migrate any existing unencrypted data
 
         initializeViews(view)
         initializeProviders()
@@ -86,11 +86,11 @@ class ProviderSettingsFragment : Fragment() {
     }
 
     private fun loadCurrentSettings() {
-        // Load saved provider settings
-        val savedProvider = sharedPrefs.getString("ai_provider", "OpenRouter") ?: "OpenRouter"
-        val savedBaseUrl = sharedPrefs.getString("ai_base_url", "")
-        val savedApiKey = sharedPrefs.getString("ai_api_key", "")
-        val savedModel = sharedPrefs.getString("ai_model", "")
+        // Load saved provider settings from secure storage
+        val savedProvider = secureStorage.getCurrentProvider()
+        val savedBaseUrl = secureStorage.getProviderBaseUrl(savedProvider) ?: ""
+        val savedApiKey = secureStorage.getApiKey(savedProvider) ?: ""
+        val savedModel = secureStorage.getProviderModel(savedProvider) ?: ""
 
         // Set spinner to saved provider
         val providerPosition = (providerSpinner.adapter as ArrayAdapter<String>)
@@ -186,26 +186,25 @@ class ProviderSettingsFragment : Fragment() {
         val model = modelSpinner.selectedItem as? String ?: ""
 
         // Validate inputs
-        if (apiKey.isEmpty()) {
+        if (apiKey.isEmpty() && providers[providerName]?.getConfiguration()?.requiresApiKey == true) {
             statusText.text = "API key is required"
             return
         }
 
-        // Save to SharedPreferences
-        sharedPrefs.edit().apply {
-            putString("ai_provider", providerName)
-            putString("ai_base_url", baseUrl)
-            putString("ai_api_key", apiKey)
-            putString("ai_model", model)
-            apply()
+        // Save to secure storage
+        secureStorage.saveProviderSettings(providerName, model, baseUrl)
+        if (apiKey.isNotEmpty()) {
+            secureStorage.saveApiKey(providerName, apiKey)
         }
 
         // Update provider with custom base URL if applicable
         if (providerName == "OpenRouter" && baseUrl.isNotEmpty()) {
             providers["OpenRouter"] = OpenRouterProvider(baseUrl)
+        } else if (providerName == "Local/Custom" && baseUrl.isNotEmpty()) {
+            (providers["Local/Custom"] as? CustomProvider)?.setBaseUrl(baseUrl)
         }
 
-        statusText.text = "Settings saved!"
+        statusText.text = "Settings saved securely!"
         Toast.makeText(context, "Provider settings saved", Toast.LENGTH_SHORT).show()
 
         // Navigate back after a short delay
