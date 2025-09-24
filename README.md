@@ -1,5 +1,8 @@
 # GlassAssistant
 
+[![Build APK](https://github.com/tribixbite/GlassAssistant/actions/workflows/build-apk.yml/badge.svg)](https://github.com/tribixbite/GlassAssistant/actions/workflows/build-apk.yml)
+[![Latest Release](https://img.shields.io/github/v/release/tribixbite/GlassAssistant)](https://github.com/tribixbite/GlassAssistant/releases)
+
 Use OpenAI's Vision and Transcription capabilities to understand the world around you - now with support for Claude and Gemini!
 
 ## Building for Google Glass XE24
