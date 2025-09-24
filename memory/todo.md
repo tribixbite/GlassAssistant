@@ -28,7 +28,7 @@
 - [x] Add on-the-fly model/profile selection UI
 - [x] Create provider profiles (OpenAI, Claude, Gemini, OpenRouter, Local)
 - [x] Add provider health check and failover
-- [ ] Implement response streaming for all providers
+- [x] Implement response streaming for all providers
 - [x] Add provider-specific parameter mapping
 
 ### [🔧] Security Hardening
