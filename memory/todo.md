@@ -2,34 +2,34 @@
 
 ## 🚨 PRIORITY: Security & Installation
 
-### [ ] Add QR-Based APK Installer
-- [ ] Add dedicated QR scan menu item to app launcher
-- [ ] Implement QR code detection and URL extraction
-- [ ] Auto-detect APK URLs in QR codes
-- [ ] Implement secure APK download with progress indicator
-- [ ] Add signature verification before installation
-- [ ] Implement automatic installation flow with permissions
-- [ ] Add safety warnings for unknown sources
+### [✓] Add QR-Based APK Installer
+- [x] Add dedicated QR scan menu item to app launcher
+- [x] Implement QR code detection and URL extraction
+- [x] Auto-detect APK URLs in QR codes
+- [x] Implement secure APK download with progress indicator
+- [x] Add signature verification before installation
+- [x] Implement automatic installation flow with permissions
+- [x] Add safety warnings for unknown sources
 - [ ] Log installation history for security audit
 
 ## 🔧 Core Modernization & Hardening
 
-### [ ] OpenRouter.ai Integration
-- [ ] Add base_url customization support in settings
-- [ ] Implement OpenRouter API client with proper headers
-- [ ] Add model listing and selection from OpenRouter catalog
-- [ ] Implement API key validation for OpenRouter
-- [ ] Add usage tracking and cost estimation
-- [ ] Cache model capabilities and pricing info
+### [✓] OpenRouter.ai Integration
+- [x] Add base_url customization support in settings
+- [x] Implement OpenRouter API client with proper headers
+- [x] Add model listing and selection from OpenRouter catalog
+- [x] Implement API key validation for OpenRouter
+- [x] Add usage tracking and cost estimation
+- [x] Cache model capabilities and pricing info
 
-### [ ] Multi-Provider Architecture
-- [ ] Refactor API client to provider-agnostic interface
-- [ ] Implement provider factory pattern
-- [ ] Add on-the-fly model/profile selection UI
-- [ ] Create provider profiles (OpenAI, Claude, Gemini, OpenRouter, Local)
-- [ ] Add provider health check and failover
+### [✓] Multi-Provider Architecture
+- [x] Refactor API client to provider-agnostic interface
+- [x] Implement provider factory pattern
+- [x] Add on-the-fly model/profile selection UI
+- [x] Create provider profiles (OpenAI, Claude, Gemini, OpenRouter, Local)
+- [x] Add provider health check and failover
 - [ ] Implement response streaming for all providers
-- [ ] Add provider-specific parameter mapping
+- [x] Add provider-specific parameter mapping
 
 ### [ ] Security Hardening
 - [ ] Implement encrypted API key storage using Android Keystore

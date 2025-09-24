@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/apiKeyFragment">
+    app:startDestination="@id/menuFragment">
 
     <fragment
         android:id="@+id/cameraFragment"
@@ -56,5 +56,47 @@
         <action
             android:id="@+id/action_apiKeyFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
+        <action
+            android:id="@+id/action_apiKeyFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="dev.synople.glassassistant.fragments.MenuFragment"
+        android:label="fragment_menu"
+        tools:layout="@layout/fragment_menu" >
+        <action
+            android:id="@+id/action_menuFragment_to_cameraFragment"
+            app:destination="@id/cameraFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_qrApkInstallerFragment"
+            app:destination="@id/qrApkInstallerFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_apiKeyFragment"
+            app:destination="@id/apiKeyFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_providerSettingsFragment"
+            app:destination="@id/providerSettingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/qrApkInstallerFragment"
+        android:name="dev.synople.glassassistant.fragments.QrApkInstallerFragment"
+        android:label="fragment_qr_apk_installer"
+        tools:layout="@layout/fragment_qr_apk_installer" >
+        <action
+            android:id="@+id/action_qrApkInstallerFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/providerSettingsFragment"
+        android:name="dev.synople.glassassistant.fragments.ProviderSettingsFragment"
+        android:label="fragment_provider_settings"
+        tools:layout="@layout/fragment_provider_settings" >
+        <action
+            android:id="@+id/action_providerSettingsFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
     </fragment>
 </navigation>
