@@ -95,6 +95,10 @@ class QrApkInstallerFragment : Fragment() {
             override fun barcodeResult(result: BarcodeResult) {
                 handleBarcodeResult(result.text)
             }
+
+            override fun possibleResultPoints(resultPoints: MutableList<com.google.zxing.ResultPoint>) {
+                // Required by interface but not used
+            }
         }
 
         barcodeView.decodeContinuous(callback)

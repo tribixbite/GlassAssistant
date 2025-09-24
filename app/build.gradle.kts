@@ -59,7 +59,7 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.8.2")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    // Removed androidx.security:security-crypto as it requires API 21+
 
     implementation("org.greenrobot:eventbus:3.3.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

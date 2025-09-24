@@ -8,8 +8,7 @@
     <com.journeyapps.barcodescanner.DecoratedBarcodeView
         android:id="@+id/barcodeScanner"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:zxing_scanner_layout="@layout/custom_barcode_scanner" />
+        android:layout_height="match_parent" />
 
     <LinearLayout
         android:layout_width="match_parent"

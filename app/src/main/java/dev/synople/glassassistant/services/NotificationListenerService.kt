@@ -232,8 +232,8 @@ class NotificationListenerService : NotificationListenerService() {
         // Save to secure storage
         secureStorage.saveProviderSettings(
             "notifications",
-            "notifications_enabled" to enabled.toString(),
-            "notification_filter" to filter.name
+            if (enabled) "true" else "false",
+            filter.name
         )
     }
 }

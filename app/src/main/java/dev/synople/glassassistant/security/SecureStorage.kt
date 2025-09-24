@@ -7,8 +7,6 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import android.util.Log
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -29,32 +27,8 @@ class SecureStorage(private val context: Context) {
     }
 
     private val sharedPreferences: SharedPreferences by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getEncryptedSharedPreferences()
-        } else {
-            // Fallback for API < 23
-            context.getSharedPreferences(LEGACY_PREFS_NAME, Context.MODE_PRIVATE)
-        }
-    }
-
-    private fun getEncryptedSharedPreferences(): SharedPreferences {
-        return try {
-            val masterKey = MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-
-            EncryptedSharedPreferences.create(
-                context,
-                PREFS_NAME,
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "Error creating encrypted shared preferences", e)
-            // Fallback to regular shared preferences
-            context.getSharedPreferences(LEGACY_PREFS_NAME, Context.MODE_PRIVATE)
-        }
+        // For Glass (API 19), we use regular SharedPreferences with custom encryption
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
     fun saveApiKey(provider: String, apiKey: String) {
