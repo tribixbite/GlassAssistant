@@ -44,10 +44,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
-    - name: Grant execute permission for scripts
-      run: |
-        chmod +x gradlew
-        chmod +x build_glass_apk.sh
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
     - name: Accept Android SDK licenses
       run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
@@ -59,8 +57,13 @@ jobs:
           "platforms;android-34" \
           "build-tools;34.0.0"
 
-    - name: Build APK using cross-platform script
-      run: ./build_glass_apk.sh
+    - name: Remove Termux-specific aapt2 override
+      run: |
+        # Remove the Termux-specific aapt2 override for GitHub Actions
+        sed -i '/android\.aapt2FromMavenOverride/d' gradle.properties || true
+
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug --no-daemon
       env:
         JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
 
