@@ -2,12 +2,14 @@ package dev.synople.glassassistant.performance
 
 import android.content.Context
 import android.media.*
+import android.media.audiofx.*
 import android.os.Build
 import android.util.Log
 import dev.synople.glassassistant.security.SecureFileManager
 import kotlinx.coroutines.*
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -327,10 +329,11 @@ class OptimizedAudioRecorder(private val context: Context) {
 
                 // Get buffer from pool
                 val buffer = getBuffer()
+                var bytesRead = 0
 
                 try {
                     // Read audio data
-                    val bytesRead = audioRecord?.read(buffer, 0, buffer.size) ?: 0
+                    bytesRead = audioRecord?.read(buffer, 0, buffer.size) ?: 0
 
                     if (bytesRead > 0) {
                         // Process audio data
@@ -454,7 +457,7 @@ class OptimizedAudioRecorder(private val context: Context) {
 
             if (dataSize > 0) {
                 // Update header with correct sizes
-                file.randomAccessFile("rw").use { raf ->
+                RandomAccessFile(file, "rw").use { raf ->
                     raf.seek(4)
                     raf.writeInt(Integer.reverseBytes((36 + dataSize).toInt()))
                     raf.seek(40)

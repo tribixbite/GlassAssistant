@@ -1,0 +1,76 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.4/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+WARNING: The option setting 'android.aapt2FromMavenOverride=/data/data/com.termux/files/home/git/glass/GlassAssistant/tools/aapt2-arm64/aapt2' is experimental.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :app:dataBindingMergeDependencyArtifactsDebug
+> Task :app:generateDebugResValues
+> Task :app:generateDebugResources
+> Task :app:packageDebugResources
+> Task :app:parseDebugLocalResources
+> Task :app:generateSafeArgsDebug
+> Task :app:mapDebugSourceSetPaths
+> Task :app:checkDebugAarMetadata
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:mergeDebugResources
+> Task :app:extractDeepLinksDebug
+> Task :app:dataBindingGenBaseClassesDebug
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:javaPreCompileDebug
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:processDebugManifestForPackage
+> Task :app:mergeDebugAssets FROM-CACHE
+> Task :app:compressDebugAssets
+> Task :app:checkDebugDuplicateClasses
+> Task :app:desugarDebugFileDependencies
+> Task :app:mergeDebugJniLibFolders FROM-CACHE
+> Task :app:mergeDebugNativeLibs
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+
+> Task :app:stripDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libimage_processing_util_jni.so.
+
+> Task :app:processDebugResources
+
+> Task :app:compileDebugKotlin
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/com/example/glassassistant/services/InstallationHistoryService.kt:312:41 'toLowerCase(Locale): String' is deprecated. Use lowercase() instead.
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/fragments/ApiKeyFragment.kt:88:15 'onActivityResult(Int, Int, Intent?): Unit' is deprecated. Deprecated in Java
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/fragments/CameraFragment.kt:180:13 'constructor MediaRecorder()' is deprecated. Deprecated in Java
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/fragments/ProviderSettingsFragment.kt:96:57 Unchecked cast: SpinnerAdapter! to ArrayAdapter<String>
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/fragments/QrApkInstallerFragment.kt:353:32 'GET_SIGNATURES: Int' is deprecated. Deprecated in Java
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/fragments/QrApkInstallerFragment.kt:359:40 'versionCode: Int' is deprecated. Deprecated in Java
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/fragments/QrApkInstallerFragment.kt:362:43 'signatures: Array<(out) Signature!>!' is deprecated. Deprecated in Java
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/fragments/QrApkInstallerFragment.kt:443:17 'requestPermissions(Array<(out) String!>, Int): Unit' is deprecated. Deprecated in Java
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/fragments/StreamingResultFragment.kt:64:35 'getSerializable(String?): Serializable?' is deprecated. Deprecated in Java
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/fragments/StreamingResultFragment.kt:65:34 'getSerializable(String?): Serializable?' is deprecated. Deprecated in Java
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/fragments/StreamingResultFragment.kt:65:63 This cast can never succeed
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/services/NotificationListenerService.kt:68:13 Variable 'subText' is never used
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/services/ai/OpenAIProvider.kt:100:42 Unnecessary safe call on a non-null receiver of type File?
+w: file:///data/data/com.termux/files/home/git/glass/GlassAssistant/app/src/main/java/dev/synople/glassassistant/services/security/RateLimiter.kt:262:21 Variable 'newBucket' is never used
+
+> Task :app:compileDebugJavaWithJavac
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+
+> Task :app:processDebugJavaRes
+> Task :app:mergeDebugJavaResource
+> Task :app:dexBuilderDebug
+> Task :app:mergeDexDebug
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+
+BUILD SUCCESSFUL in 2m
+37 actionable tasks: 35 executed, 2 from cache

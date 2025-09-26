@@ -16,7 +16,7 @@ import java.net.UnknownHostException
 abstract class BaseProvider(protected val context: Context) : AIProvider {
 
     companion object {
-        private const val TAG = "BaseProvider"
+        const val TAG = "BaseProvider"
         private const val MAX_RETRIES = 3
         private const val RETRY_DELAY_MS = 1000L
         private const val CONNECTION_TIMEOUT = 30000

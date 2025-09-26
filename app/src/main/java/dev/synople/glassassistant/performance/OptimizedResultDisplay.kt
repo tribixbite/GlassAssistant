@@ -192,7 +192,7 @@ class OptimizedResultDisplay @JvmOverloads constructor(
 
         val lines = mutableListOf<String>()
         val words = text.split("\\s+".toRegex())
-        val availableWidth = width - (paddingPx * 2)
+        val availableWidth = (width - (paddingPx * 2)).toFloat()
 
         if (availableWidth <= 0) {
             // Fallback if view not measured yet

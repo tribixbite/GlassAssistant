@@ -6,7 +6,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
-import androidx.exifinterface.media.ExifInterface
+import android.media.ExifInterface
 import java.io.*
 import java.nio.ByteBuffer
 import kotlin.math.min

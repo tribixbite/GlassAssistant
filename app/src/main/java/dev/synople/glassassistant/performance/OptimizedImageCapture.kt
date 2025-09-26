@@ -11,6 +11,7 @@ import android.util.Log
 import android.util.Size
 import androidx.camera.camera2.interop.Camera2CameraInfo
 import androidx.camera.core.*
+import androidx.camera.core.Camera
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -59,7 +60,7 @@ class OptimizedImageCapture(
 
     private val secureFileManager = SecureFileManager.getInstance(context)
     private val captureScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val activeCaptureJobs = mutableSetOf<Job>()
+    private val activeCaptureJobs = mutableSetOf<Deferred<*>>()
 
     // Memory-efficient bitmap pool
     private val bitmapPool = BitmapPool(maxSize = 5)
@@ -146,7 +147,7 @@ class OptimizedImageCapture(
             return null
         }
 
-        val captureJob = captureScope.launch {
+        val captureJob = captureScope.async {
             performOptimizedCapture(config)
         }
 

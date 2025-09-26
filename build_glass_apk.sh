@@ -2,17 +2,29 @@
 
 echo "Building APK for Google Glass XE24..."
 
-# Set environment variables if not already set
+# Set environment variables for Termux
 if [ -z "$JAVA_HOME" ]; then
-    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    export JAVA_HOME=/data/data/com.termux/files/usr
     export PATH=$PATH:$JAVA_HOME/bin
 fi
 
 if [ -z "$ANDROID_HOME" ]; then
-    export ANDROID_HOME=~/Android/Sdk
+    export ANDROID_HOME=/data/data/com.termux/files/usr/share/android-sdk
     export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
     export PATH=$PATH:$ANDROID_HOME/platform-tools
 fi
+
+# Verify environment
+echo "Java version:"
+java -version
+echo ""
+echo "Android SDK location: $ANDROID_HOME"
+if [ ! -d "$ANDROID_HOME" ]; then
+    echo "❌ Android SDK not found at $ANDROID_HOME"
+    echo "Please install Android SDK: pkg install android-sdk"
+    exit 1
+fi
+echo ""
 
 # Clean previous builds
 echo "Cleaning previous builds..."

@@ -20,8 +20,8 @@ class ResponseCacheManager private constructor(private val context: Context) {
         private const val CACHE_DIR_NAME = "api_response_cache"
         private const val MEMORY_CACHE_SIZE = 20 // Limited for Glass hardware
         private const val DISK_CACHE_SIZE_MB = 50L // 50MB disk cache
-        private const val DEFAULT_TTL_MS = TimeUnit.HOURS.toMillis(6) // 6 hours
-        private const val CLEANUP_INTERVAL_MS = TimeUnit.HOURS.toMillis(1) // 1 hour cleanup
+        private val DEFAULT_TTL_MS = TimeUnit.HOURS.toMillis(6) // 6 hours
+        private val CLEANUP_INTERVAL_MS = TimeUnit.HOURS.toMillis(1) // 1 hour cleanup
         private const val MAX_RESPONSE_SIZE = 1024 * 1024 // 1MB max response size
 
         @Volatile

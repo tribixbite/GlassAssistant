@@ -253,7 +253,7 @@ class DatabaseOptimizer private constructor(context: Context) : SQLiteOpenHelper
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error getting database stats", e)
-            mapOf("error" to e.message)
+            mapOf("error" to (e.message ?: "Unknown error"))
         }
     }
 }

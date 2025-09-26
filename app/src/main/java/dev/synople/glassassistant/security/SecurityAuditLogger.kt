@@ -287,7 +287,7 @@ class SecurityAuditLogger private constructor(private val context: Context) {
                 "log_directory_size" to (logFiles?.sumOf { it.length() } ?: 0L)
             )
         } catch (e: Exception) {
-            mapOf("error" to e.message)
+            mapOf("error" to (e.message ?: "Unknown error"))
         }
     }
 
