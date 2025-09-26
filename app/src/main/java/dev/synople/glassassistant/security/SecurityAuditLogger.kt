@@ -362,7 +362,7 @@ class SecurityAuditLogger private constructor(private val context: Context) {
     private suspend fun flushLogs() {
         if (logQueue.isEmpty()) return
 
-        withContext(Dispatchers.IO) {
+        withContext<Unit>(Dispatchers.IO) {
             try {
                 val logFile = getCurrentLogFile()
                 val entries = mutableListOf<AuditLogEntry>()

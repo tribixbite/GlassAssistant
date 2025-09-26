@@ -437,7 +437,7 @@ class ResponseCacheManager private constructor(private val context: Context) {
     /**
      * Performs periodic cleanup of expired entries
      */
-    private suspend fun performPeriodicCleanup() = withContext(Dispatchers.IO) {
+    private suspend fun performPeriodicCleanup(): Unit = withContext(Dispatchers.IO) {
         try {
             val currentTime = System.currentTimeMillis()
 
@@ -475,7 +475,8 @@ class ResponseCacheManager private constructor(private val context: Context) {
      */
     private fun compressString(input: String): String {
         return try {
-            java.util.zip.Deflater().use { deflater ->
+            val deflater = java.util.zip.Deflater()
+            try {
                 deflater.setInput(input.toByteArray())
                 deflater.finish()
 
@@ -490,6 +491,8 @@ class ResponseCacheManager private constructor(private val context: Context) {
                 }
 
                 android.util.Base64.encodeToString(compressedData.toByteArray(), android.util.Base64.NO_WRAP)
+            } finally {
+                deflater.end()
             }
         } catch (e: Exception) {
             Log.w(TAG, "Compression failed, using original", e)
@@ -504,7 +507,8 @@ class ResponseCacheManager private constructor(private val context: Context) {
         return try {
             val compressedData = android.util.Base64.decode(compressed, android.util.Base64.NO_WRAP)
 
-            java.util.zip.Inflater().use { inflater ->
+            val inflater = java.util.zip.Inflater()
+            try {
                 inflater.setInput(compressedData)
 
                 val buffer = ByteArray(1024)
@@ -518,6 +522,8 @@ class ResponseCacheManager private constructor(private val context: Context) {
                 }
 
                 String(decompressedData.toByteArray())
+            } finally {
+                inflater.end()
             }
         } catch (e: Exception) {
             Log.w(TAG, "Decompression failed", e)

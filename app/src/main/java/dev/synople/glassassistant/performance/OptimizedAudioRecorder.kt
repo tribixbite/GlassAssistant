@@ -449,7 +449,7 @@ class OptimizedAudioRecorder(private val context: Context) {
     private suspend fun finalizeWavFile(
         audioFile: dev.synople.glassassistant.security.SecureFile,
         durationMs: Long
-    ) = withContext(Dispatchers.IO) {
+    ): Unit = withContext(Dispatchers.IO) {
         try {
             val file = audioFile.getFile()
             val fileSize = file.length()

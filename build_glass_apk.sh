@@ -8,11 +8,11 @@ if [ -z "$JAVA_HOME" ]; then
     export PATH=$PATH:$JAVA_HOME/bin
 fi
 
-if [ -z "$ANDROID_HOME" ]; then
-    export ANDROID_HOME=/data/data/com.termux/files/usr/share/android-sdk
-    export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
-    export PATH=$PATH:$ANDROID_HOME/platform-tools
-fi
+# Use the complete Android SDK in home directory
+export ANDROID_HOME=/data/data/com.termux/files/home/android-sdk
+export ANDROID_SDK_ROOT=$ANDROID_HOME
+export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
+export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 # Verify environment
 echo "Java version:"
